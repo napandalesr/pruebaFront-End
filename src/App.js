@@ -1,5 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import axios from 'axios'
+import loading from './image/loading.gif'; 
+import  './css/style.css'; 
 import {Edit, Delete} from '@material-ui/icons'
 
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -11,7 +13,13 @@ const url = 'https://gorest.co.in/public-api/users'
 
 function App() {
 
-  
+  const loadingVisible = () => { 
+    document.getElementById("loading").style.display='block';
+  }
+
+  const loadingInvisible = () => { 
+    document.getElementById("loading").style.display='none';
+  }
 
   const [data, setData]=useState([])
   const [dataSelect, setDataSelect]=useState({
@@ -37,17 +45,17 @@ function App() {
     Error interno de servidor 500. Esto podría deberse a errores internos del programa.`
 
   const peticionGet=async()=>{
+    loadingVisible()
     await axios.get(url)
     .then(response=>{
       console.log(response.data.data)
       setData(response.data.data)
+      loadingInvisible()
     })
-    console.log(dataSelect)
   }
 
   const peticionPost=async()=>{
-    console.log('dataSelect')
-    console.log(dataSelect)
+    loadingVisible()
     await axios.post('https://gorest.co.in/public-api/users',
     dataSelect,
     {
@@ -59,12 +67,13 @@ function App() {
     })
     .then(response=>{
       setDataSelect(data.concat(response.data))
-      console.log(response.data)
+      loadingInvisible()
       alert('Codigo '+response.data.code+code)
     })
   }
 
   const peticionPut=async()=>{
+    loadingVisible()
     await axios.put(url+'/'+dataSelect.id,dataSelect,
       {
         headers:{
@@ -75,12 +84,14 @@ function App() {
       })
     .then(response=>{
       setDataSelect(data.concat(response.data))
+      loadingInvisible()
       alert('Codigo '+response.data.code+code)
       peticionGet()
     })
   }
 
   const peticionDelete=async()=>{
+    loadingVisible()
     await axios.delete(url+'/'+dataSelect.id,
     {
       headers:{
@@ -91,7 +102,7 @@ function App() {
     })
     .then(response=>{
       setDataSelect(data.concat(response.data))
-      
+      loadingInvisible()
       alert('Codigo '+response.data.code+code)
       peticionGet()
     }
@@ -140,10 +151,13 @@ function App() {
   const cancelCourse = () => { 
     document.getElementById("create-course-form").reset();
   }
+
+  
   
 
   return (
     <div className="App container">
+      <img id='loading' src={loading}></img>
       <table class="table table-striped">
         <thead>
         <tr>
@@ -204,7 +218,7 @@ function App() {
         </div>
         <div class="form-group">
           <label for="gender">Genero</label>
-          <select class="form-control" id="gender" name="gender">
+          <select class="form-control" id="gender" name="gender" onChange={handleChange}>
             <option></option>
             <option>Male</option>
             <option>Female</option>
@@ -212,7 +226,7 @@ function App() {
         </div>
         <div class="form-group">
           <label for="status">Estado</label>
-          <select class="form-control" id="gender" name="gender">
+          <select class="form-control" id="status" name="status" onChange={handleChange}>
             <option></option>
             <option>Active</option>
             <option>Inactive</option>
@@ -260,7 +274,7 @@ function App() {
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-        <button type="button" class="btn btn-primary" onClick={()=>peticionPut()}>Actualizar</button>
+        <button type="button" class="btn btn-primary" data-dismiss="modal"onClick={()=>peticionPut()}>Actualizar</button>
       </div>
     </div>
   </div>
